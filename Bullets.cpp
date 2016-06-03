@@ -14,9 +14,7 @@ void Bullets::activate(Arduboy *d) {
     } else if(bullets[i].x > 128) {
       bullets[i].x = -5;
     } else {
-      //if (d->everyXFrames(1)) {
-        bullets[i].x++;
-      //}
+        bullets[i].x += 3;
     }
   }
 }
