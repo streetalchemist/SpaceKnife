@@ -8,14 +8,15 @@ Stars stars;
 Bullets bullets;
 
 
-int x=0; //Ship x
-int y=0; //Ship y
+int x=5; //Ship x
+int y=20; //Ship y
 int enemyX = 80; //enemy x
 int enemyY = 25; //enemy y
 int enemyWidth = 21;
 int enemyHeight = 15;
 int shipSpeed=3;
 int score=0;
+int gameState = 1;
 uint8_t bulletCounter = 0;
 bool canShoot = true;
 uint8_t frameCount = 1;
@@ -46,43 +47,46 @@ void loop() {
 
   //active background starz
   stars.activate(&arduboy);
-  bullets.activate(&arduboy);
 
-  // if the right button is pressed move 1 pixel to the right every frame
-  if(arduboy.pressed(RIGHT_BUTTON) && (x < X_MAX)) {
-    x+= shipSpeed;
-  }
-
-  // if the left button is pressed move 1 pixel to the left every frame
-  if(arduboy.pressed(LEFT_BUTTON) && (x > 0)) {
-    x-= shipSpeed;
-  }
-
-  // if the up button or B button is pressed move 1 pixel up every frame
-  if(arduboy.pressed(UP_BUTTON) && (y > 0)) {
-    y-= shipSpeed;
-  }
-
-  // if the down button or A button is pressed move 1 pixel down every frame
-  if(arduboy.pressed(DOWN_BUTTON) && (y < Y_MAX)) {
-    y+= shipSpeed;
-  }
-
-  if(arduboy.pressed(A_BUTTON)) {
-    if(canShoot) {
-      shoot();
+  if(gameState == 1) {
+    bullets.activate(&arduboy);
+  
+    // if the right button is pressed move 1 pixel to the right every frame
+    if(arduboy.pressed(RIGHT_BUTTON) && (x < X_MAX)) {
+      x+= shipSpeed;
     }
+  
+    // if the left button is pressed move 1 pixel to the left every frame
+    if(arduboy.pressed(LEFT_BUTTON) && (x > 0)) {
+      x-= shipSpeed;
+    }
+  
+    // if the up button or B button is pressed move 1 pixel up every frame
+    if(arduboy.pressed(UP_BUTTON) && (y > 0)) {
+      y-= shipSpeed;
+    }
+  
+    // if the down button or A button is pressed move 1 pixel down every frame
+    if(arduboy.pressed(DOWN_BUTTON) && (y < Y_MAX)) {
+      y+= shipSpeed;
+    }
+  
+    if(arduboy.pressed(A_BUTTON)) {
+      if(canShoot) {
+        shoot();
+      }
+    }
+  
+    if(arduboy.notPressed(A_BUTTON)) {
+      canShoot = true;
+    }
+
+    //Check Bullet Collisions
+    checkCollisions();
+  
+    arduboy.drawBitmap(x, y, bitmap_ship, 20, 10, WHITE);
   }
-
-  if(arduboy.notPressed(A_BUTTON)) {
-    canShoot = true;
-  }
-
-  //Check Bullet Collisions
-  checkCollisions();
-
-  arduboy.drawBitmap(x, y, bitmap_ship, 20, 10, WHITE);
-
+  
   //Enemy Movement
   if(arduboy.everyXFrames(2)) {
     enemyX--;
@@ -109,8 +113,29 @@ void loop() {
     }
   }
 
+
+  if(gameState == 2) {
+    arduboy.setCursor(37, 30);
+    arduboy.print("GAME OVER");
+
+    arduboy.setCursor(11, 53);
+    arduboy.print("press A to restart");
+
+    if(arduboy.pressed(B_BUTTON)) {
+      restart();
+    }
+    
+  }
+
   arduboy.display();
   arduboy.clear();
+}
+
+void restart() {
+  score = 0;
+  x = 5;
+  y = 20;
+  gameState = 1;
 }
 
 void shoot() {
@@ -131,6 +156,11 @@ void checkCollisions() {
       score++;
       bullets.bullets[i].x = -50;
     }
+  }
+
+  if(doesIntersect(x,y,20,10,enemyX, enemyY, enemyWidth, enemyHeight)) {
+    x = -100;
+    gameState = 2;
   }
 }
 
