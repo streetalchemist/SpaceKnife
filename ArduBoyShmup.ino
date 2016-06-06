@@ -129,6 +129,7 @@ void checkCollisions() {
       enemyX = -30;
       enemyY = 0;
       score++;
+      bullets.bullets[i].x = -50;
     }
   }
 }
