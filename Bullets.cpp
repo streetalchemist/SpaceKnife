@@ -12,7 +12,7 @@ void Bullets::activate(Arduboy *d) {
     if (bullets[i].x < 0) {
 
     } else if(bullets[i].x > 128) {
-      bullets[i].x = -5;
+      bullets[i].x = -50;
     } else {
         bullets[i].x += 3;
     }
