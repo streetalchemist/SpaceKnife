@@ -2,24 +2,22 @@
 #include "bitmaps.h"
 #include "Stars.h"
 #include "Bullets.h"
+#include "Enemies.h"
 
 Arduboy arduboy;
 Stars stars;
 Bullets bullets;
+Enemies enemies;
 
 
 int x=5; //Ship x
 int y=20; //Ship y
-int enemyX = 80; //enemy x
-int enemyY = 25; //enemy y
-int enemyWidth = 21;
-int enemyHeight = 15;
 int shipSpeed=3;
 int score=0;
 int gameState = 1;
 uint8_t bulletCounter = 0;
 bool canShoot = true;
-uint8_t frameCount = 1;
+//uint8_t frameCount = 1;
 String scoreString = "Score: ";
 
 #define X_MAX (WIDTH - 20)
@@ -32,6 +30,7 @@ void setup() {
   arduboy.setFrameRate(60);
   arduboy.display();
   intro();
+  enemies.setup();
 }
 
 void loop() {
@@ -88,30 +87,7 @@ void loop() {
   }
   
   //Enemy Movement
-  if(arduboy.everyXFrames(2)) {
-    enemyX--;
-    if(enemyX+enemyWidth < -10) {
-      enemyX = 130;
-      enemyY = random(5,50); 
-    }
-  }
-
-  if(frameCount%4 == 0) {
-    arduboy.drawBitmap(enemyX, enemyY, bitmap_enemy_1, enemyWidth, enemyHeight, WHITE);
-  } else if(frameCount%4 == 1) {
-    arduboy.drawBitmap(enemyX, enemyY, bitmap_enemy_2, enemyWidth, enemyHeight, WHITE);
-  } else if(frameCount%4 == 2) {
-    arduboy.drawBitmap(enemyX, enemyY, bitmap_enemy_3, enemyWidth, enemyHeight, WHITE); 
-  } else {
-    arduboy.drawBitmap(enemyX, enemyY, bitmap_enemy_2, enemyWidth, enemyHeight, WHITE);
-  }
-    
-  if (arduboy.everyXFrames(6)) {
-    frameCount++;
-    if(frameCount > 11) {
-      frameCount = 0;
-    }
-  }
+  enemies.activate(&arduboy);
 
 
   if(gameState == 2) {
@@ -136,6 +112,7 @@ void restart() {
   x = 5;
   y = 20;
   gameState = 1;
+  enemies.setup();
 }
 
 void shoot() {
@@ -149,18 +126,20 @@ void shoot() {
 }
 
 void checkCollisions() {
-  for(int i = 0; i < 16; i++) {
-    if(doesIntersect(bullets.bullets[i].x,bullets.bullets[i].y, 3,1,enemyX,enemyY,enemyWidth,enemyHeight)) {
-      enemyX = -30;
-      enemyY = 0;
-      score++;
-      bullets.bullets[i].x = -50;
+  for(int enemyIndex = 0; enemyIndex < 8; enemyIndex++) {
+    for(int bulletIndex = 0; bulletIndex < 16; bulletIndex++) {
+      if(doesIntersect(bullets.bullets[bulletIndex].x,bullets.bullets[bulletIndex].y, 3,1,enemies.enemiesArr[enemyIndex].x,enemies.enemiesArr[enemyIndex].y,enemies.enemyWidth,enemies.enemyHeight)) {
+        enemies.reset(enemyIndex);
+        score++;
+        bullets.bullets[bulletIndex].x = -50;
+      }
     }
-  }
 
-  if(doesIntersect(x,y,20,10,enemyX, enemyY, enemyWidth, enemyHeight)) {
-    x = -100;
-    gameState = 2;
+    if(doesIntersect(x,y,20,10,enemies.enemiesArr[enemyIndex].x, enemies.enemiesArr[enemyIndex].y, enemies.enemyWidth, enemies.enemyHeight)) {
+      x = -100;
+      gameState = 2;
+    }
+    
   }
 }
 
