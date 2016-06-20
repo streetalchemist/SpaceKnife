@@ -153,16 +153,25 @@ bool doesIntersect(int x1, int y1,int width1,int height1,int x2,int y2,int width
 
 void intro()
 {
-  for(int i = -8; i < 28; i = i + 2)
-  {
-    arduboy.clear();
-    arduboy.setCursor(30, i);
-    arduboy.print("ArduBoyShmup");
-    arduboy.display();
-  }
+//  for(int i = -8; i < 28; i = i + 2)
+//  {
+//    arduboy.clear();
+//    arduboy.setCursor(30, i);
+//    arduboy.print("ArduBoyShmup");
+//    arduboy.display();
+//  }
+  arduboy.clear();
+  arduboy.drawBitmap(0, 0, bitmap_streetalchemist, 128, 64, WHITE);
+  arduboy.display();
+  delay(3000);
+
+
+  arduboy.clear();
+  arduboy.drawBitmap(0, 0, bitmap_intro_screen, 128, 64, WHITE);
+  arduboy.display();
 
   //arduboy.tunes.tone(987, 160);
   delay(160);
   //arduboy.tunes.tone(1318, 400);
-  delay(2000);
+  delay(3000);
 }

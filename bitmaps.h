@@ -2,7 +2,8 @@
 #ifndef BITMAPS_H
 #define BITMAPS_H
 
-
+extern const unsigned char bitmap_intro_screen[];
+extern const unsigned char bitmap_streetalchemist[];
 extern const unsigned char bitmap_ship[];
 extern const unsigned char bitmap_enemy_1[];
 extern const unsigned char bitmap_enemy_2[];
