@@ -3,31 +3,67 @@
 #include "Stars.h"
 #include "Bullets.h"
 #include "Enemies.h"
+#include "Squawk.h"
+//#include "tunes.h"
+#include <EEPROM.h>
+#include "localEEPROM.h"
+
+SQUAWK_CONSTRUCT_ISR(SQUAWK_PWM_PIN5)
 
 Arduboy arduboy;
+AbPrinter text(arduboy);
 Stars stars;
 Bullets bullets;
 Enemies enemies;
+ArduboyEeprom savedData;
 
+int retVal;
 
 int x=5; //Ship x
 int y=20; //Ship y
 int shipSpeed=3;
-int score=0;
+uint8_t score=0;
 int gameState = 1;
 uint8_t bulletCounter = 0;
 bool canShoot = true;
 //uint8_t frameCount = 1;
 String scoreString = "Score: ";
+String highScoreString = "High Score: ";
+uint8_t savedScore;
 
 #define X_MAX (WIDTH - 20)
 
 #define Y_MAX (HEIGHT - 10)
 
 void setup() {
+  
+  // Set up Squawk to generate samples at 32kHz.
+  // Squawk always steals Timer1 for sample crunching.
+  //Squawk.begin(32000);
+  // Begin playback of melody.
+  //Squawk.play(TheOriginalSquawk);
+  // Tune the song to something more suitable for a piezo
+  //Squawk.tune(2.0);
+  // Lower the tempo ever so slightly
+  //Squawk.tempo(48);
+  if ((retVal = savedData.EEPROM_BEGIN) != 0) {
+    if (retVal == EEPROM_ALLOCATED) {
+      //EMPTY REGISTER
+      //savedData.write(0, score);
+      savedScore = savedData.read(0);
+    }
+    else {
+      text.print("Allocate Error: ");
+      text.println(retVal);
+    }
+  }
+  else {
+    //savedScore = savedData.read(0);
+    savedData.write(0, score);
+  }
   // put your setup code here, to run once:
   arduboy.begin();
-  arduboy.setFrameRate(60);
+  arduboy.setFrameRate(40);
   arduboy.display();
   intro();
   enemies.setup();
@@ -40,9 +76,9 @@ void loop() {
   }
 
   //Show Score
-  arduboy.setCursor(40, 5);
+  text.setCursor(40, 5);
   String scoreValue = scoreString+score;
-  arduboy.print(scoreValue);
+  text.print(scoreValue);
 
   //active background starz
   stars.activate(&arduboy);
@@ -91,11 +127,15 @@ void loop() {
 
 
   if(gameState == 2) {
-    arduboy.setCursor(37, 30);
-    arduboy.print("GAME OVER");
+    text.setCursor(37, 30);
+    text.print("GAME OVER");
+    text.setCursor(25, 40);
+    String highScoreValue;
+    highScoreValue = highScoreString+savedScore;
+    text.print(highScoreValue);
 
-    arduboy.setCursor(11, 53);
-    arduboy.print("press A to restart");
+    text.setCursor(11, 53);
+    text.print("press A to restart");
 
     if(arduboy.pressed(B_BUTTON)) {
       restart();
@@ -137,6 +177,7 @@ void checkCollisions() {
 
     if(doesIntersect(x,y,20,10,enemies.enemiesArr[enemyIndex].x, enemies.enemiesArr[enemyIndex].y, enemies.enemyWidth, enemies.enemyHeight)) {
       x = -100;
+      setHighScore();
       gameState = 2;
     }
     
@@ -151,6 +192,13 @@ bool doesIntersect(int x1, int y1,int width1,int height1,int x2,int y2,int width
   return false;
 }
 
+void setHighScore() {
+    if(score > savedScore) {
+      savedData.write(0, score);
+      savedScore = score;
+    }
+}
+
 void intro()
 {
 //  for(int i = -8; i < 28; i = i + 2)
@@ -160,6 +208,10 @@ void intro()
 //    arduboy.print("ArduBoyShmup");
 //    arduboy.display();
 //  }
+  //arduboy.tunes.tone(987, 160);
+  //delay(160);
+  //arduboy.tunes.tone(1318, 400);
+
   arduboy.clear();
   arduboy.drawBitmap(0, 0, bitmap_streetalchemist, 128, 64, WHITE);
   arduboy.display();
@@ -170,8 +222,5 @@ void intro()
   arduboy.drawBitmap(0, 0, bitmap_intro_screen, 128, 64, WHITE);
   arduboy.display();
 
-  //arduboy.tunes.tone(987, 160);
-  delay(160);
-  //arduboy.tunes.tone(1318, 400);
   delay(3000);
 }
