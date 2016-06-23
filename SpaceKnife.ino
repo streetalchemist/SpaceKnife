@@ -1,3 +1,8 @@
+// Space Knife game for Arduboy
+// https://github.com/streetalchemist/SpaceKnife
+// Alex Porter 2016
+// alex@streetalchemy.com
+
 #include "Arduboy.h"
 #include "bitmaps.h"
 #include "Stars.h"
@@ -22,7 +27,7 @@ int retVal;
 int x=5; //Ship x
 int y=20; //Ship y
 int shipSpeed=3;
-uint8_t score=0;
+int score=0;
 int gameState = 1;
 uint8_t bulletCounter = 0;
 bool canShoot = true;
@@ -46,21 +51,22 @@ void setup() {
   //Squawk.tune(2.0);
   // Lower the tempo ever so slightly
   //Squawk.tempo(48);
-  if ((retVal = savedData.EEPROM_BEGIN) != 0) {
-    if (retVal == EEPROM_ALLOCATED) {
-      //EMPTY REGISTER
-      //savedData.write(0, score);
-      savedScore = savedData.read(0);
-    }
-    else {
-      text.print("Allocate Error: ");
-      text.println(retVal);
-    }
-  }
-  else {
-    //savedScore = savedData.read(0);
-    savedData.write(0, score);
-  }
+  // Setup High Score Saving
+  //  if ((retVal = savedData.EEPROM_BEGIN) != 0) {
+  //    if (retVal == EEPROM_ALLOCATED) {
+  //      //EMPTY REGISTER
+  //      //savedData.write(0, score);
+  //      savedScore = savedData.read(0);
+  //    }
+  //    else {
+  //      text.print("Allocate Error: ");
+  //      text.println(retVal);
+  //    }
+  //  }
+  //  else {
+  //    //savedScore = savedData.read(0);
+  //    savedData.write(0, score);
+  //  }
   // put your setup code here, to run once:
   arduboy.begin();
   arduboy.setFrameRate(40);
@@ -125,14 +131,16 @@ void loop() {
   //Enemy Movement
   enemies.activate(&arduboy);
 
-
+  //Game Over Screen Game State
   if(gameState == 2) {
     text.setCursor(37, 30);
     text.print("GAME OVER");
-    text.setCursor(25, 40);
-    String highScoreValue;
-    highScoreValue = highScoreString+savedScore;
-    text.print(highScoreValue);
+
+    //Print High Score
+    //text.setCursor(25, 40);
+    //String highScoreValue;
+    //highScoreValue = highScoreString+savedScore;
+    //text.print(highScoreValue);
 
     text.setCursor(11, 53);
     text.print("press A to restart");
@@ -177,7 +185,7 @@ void checkCollisions() {
 
     if(doesIntersect(x,y,20,10,enemies.enemiesArr[enemyIndex].x, enemies.enemiesArr[enemyIndex].y, enemies.enemyWidth, enemies.enemyHeight)) {
       x = -100;
-      setHighScore();
+      //setHighScore();
       gameState = 2;
     }
     
@@ -192,25 +200,15 @@ bool doesIntersect(int x1, int y1,int width1,int height1,int x2,int y2,int width
   return false;
 }
 
-void setHighScore() {
-    if(score > savedScore) {
-      savedData.write(0, score);
-      savedScore = score;
-    }
-}
+//void setHighScore() {
+//    if(score > savedScore) {
+//      savedData.write(0, score);
+//      savedScore = score;
+//    }
+//}
 
 void intro()
 {
-//  for(int i = -8; i < 28; i = i + 2)
-//  {
-//    arduboy.clear();
-//    arduboy.setCursor(30, i);
-//    arduboy.print("ArduBoyShmup");
-//    arduboy.display();
-//  }
-  //arduboy.tunes.tone(987, 160);
-  //delay(160);
-  //arduboy.tunes.tone(1318, 400);
 
   arduboy.clear();
   arduboy.drawBitmap(0, 0, bitmap_streetalchemist, 128, 64, WHITE);
