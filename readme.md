@@ -4,9 +4,6 @@ A side-scrolling shoot-em-up (shmup) for the Arduboy gaming platform
 ![Streetalchemist Logo](https://raw.githubusercontent.com/streetalchemist/SpaceKnife/master/production/streetAlchemyScreen.png)
 ![Space Knife Title Screen](https://raw.githubusercontent.com/streetalchemist/SpaceKnife/master/production/titleScreen.png)
 
-#####Arduboy Version Compatibility Warning
-For now this uses the Arduboy 1.2 alpha, I'll be creating another branch soon that is compatible with 1.1
-
 
 ###Version 1.0
 

@@ -8,15 +8,15 @@
 #include "Stars.h"
 #include "Bullets.h"
 #include "Enemies.h"
-#include "Squawk.h"
+//#include "Squawk.h"
 //#include "tunes.h"
 #include <EEPROM.h>
 #include "localEEPROM.h"
 
-SQUAWK_CONSTRUCT_ISR(SQUAWK_PWM_PIN5)
+//SQUAWK_CONSTRUCT_ISR(SQUAWK_PWM_PIN5)
 
 Arduboy arduboy;
-AbPrinter text(arduboy);
+//AbPrinter text(arduboy);
 Stars stars;
 Bullets bullets;
 Enemies enemies;
@@ -69,7 +69,7 @@ void setup() {
   //  }
   // put your setup code here, to run once:
   arduboy.begin();
-  arduboy.setFrameRate(40);
+  arduboy.setFrameRate(60);
   arduboy.display();
   intro();
   enemies.setup();
@@ -82,9 +82,9 @@ void loop() {
   }
 
   //Show Score
-  text.setCursor(40, 5);
+  arduboy.setCursor(40, 5);
   String scoreValue = scoreString+score;
-  text.print(scoreValue);
+  arduboy.print(scoreValue);
 
   //active background starz
   stars.activate(&arduboy);
@@ -133,17 +133,17 @@ void loop() {
 
   //Game Over Screen Game State
   if(gameState == 2) {
-    text.setCursor(37, 30);
-    text.print("GAME OVER");
+    arduboy.setCursor(37, 30);
+    arduboy.print("GAME OVER");
 
     //Print High Score
-    //text.setCursor(25, 40);
+    //arduboy.setCursor(25, 40);
     //String highScoreValue;
     //highScoreValue = highScoreString+savedScore;
-    //text.print(highScoreValue);
+    //arduboy.print(highScoreValue);
 
-    text.setCursor(11, 53);
-    text.print("press A to restart");
+    arduboy.setCursor(11, 53);
+    arduboy.print("press A to restart");
 
     if(arduboy.pressed(B_BUTTON)) {
       restart();
